@@ -2,14 +2,15 @@
 > [!CAUTION]
 > This is not proudction ready.
 
+> [!CAUTION]
 > This is not audited.
 
+> [!WARNING] 
 > :warning: Use it at your own risk.
 
 Policy logic development via a ZK program(off-chain programmable permission).
 
-🛡️ ContractValueWhitelistPolicy
-ContractValueWhitelistPolicy is a stateless, zero-knowledge circuit for validating whether a user operation complies with pre-established execution rules. It supports native token transfers, ERC20 transfers, and smart contract calls, and ensures all destination addresses are whitelisted via Merkle proofs.
+🛡️ ContractValueWhitelistPolicy is a stateless, zero-knowledge circuit for validating whether a user operation complies with pre-established validation rules. It supports native token transfers, ERC20 transfers, and smart contract calls, and ensures all destination addresses are whitelisted via Merkle proofs.
 
 ✅ What It Proves
 1. Smart contract calls are made only to addresses included in a predefined contract whitelist (via Merkle inclusion proof).
@@ -17,6 +18,7 @@ ContractValueWhitelistPolicy is a stateless, zero-knowledge circuit for validati
 2. Value transfers—either in native tokens or ERC20 tokens—are made only to whitelisted recipient addresses (also verified via Merkle proofs).
 
 Artifacts generation: proving and verification keys
+
     1. Create new 'build' folder and open new command line inside circuits folder. 
 
     2. Install circom compiler. More info: https://docs.circom.io/getting-started/installation/
@@ -38,5 +40,5 @@ Artifacts generation: proving and verification keys
     10. contractValueWhitelistPolicy_0001.zkey is the proving key. It is used to generate a ZK proof in the both client or server side.
 
     11. Export verfication key: snarkjs zkey export verificationkey build/2_17_17/contractValueWhitelistPolicy_0001.zkey build/2_17_17/contractValueWhitelistPolicy_verification_key.json 
-     
+
     12. Export verfication key in Solidity format: snarkjs zkey export solidityverifier build/2_17_17/contractValueWhitelistPolicy_0001.zkey build/2_17_17/contractValueWhitelistPolicy_verification_key.sol
