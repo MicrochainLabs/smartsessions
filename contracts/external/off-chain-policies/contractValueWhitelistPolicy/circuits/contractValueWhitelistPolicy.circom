@@ -97,11 +97,12 @@ template ContractValueWhitelistPolicy(transactionNumber, smartContractCallTreeLe
 
 
     //2835717307 transfer(to, amount) function selector
-    component isErc20Transfer[transactionNumber];
+    //component isErc20Transfer[transactionNumber];
+    component isTokenTransferOrApprove[transactionNumber];
      for (var i=0; i<transactionNumber; i++) {
-        isErc20Transfer[i] = IsEqual();
-        isErc20Transfer[i].in[0] <== 2835717307;
-        isErc20Transfer[i].in[1] <== functionSelector[i];
+        //isErc20Transfer[i] = IsEqual();
+        isTokenTransferOrApprove[i] = IsZero();
+        isTokenTransferOrApprove[i].in <== erc20TransferTo[i];
     }
     component erc20TransferToAddressInclusionValidity[transactionNumber];
     for (var i=0; i<transactionNumber; i++) {
@@ -113,8 +114,8 @@ template ContractValueWhitelistPolicy(transactionNumber, smartContractCallTreeLe
         }
     }
     for (var i=0; i<transactionNumber; i++) {
-        erc20ToTreeRootPerTransaction[i] <== valueWhitelistRoot * isErc20Transfer[i].out;
-        computedErc20ToTreeRootPerTransaction[i] <== erc20TransferToAddressInclusionValidity[i].root * isErc20Transfer[i].out;
+        erc20ToTreeRootPerTransaction[i] <== valueWhitelistRoot * (1 - isTokenTransferOrApprove[i].out);
+        computedErc20ToTreeRootPerTransaction[i] <== erc20TransferToAddressInclusionValidity[i].root * (1 - isTokenTransferOrApprove[i].out);
         erc20ToTreeRootPerTransaction[i] === computedErc20ToTreeRootPerTransaction[i];
     }
 
