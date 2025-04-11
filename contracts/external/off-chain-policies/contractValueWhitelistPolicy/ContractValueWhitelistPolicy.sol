@@ -1,1 +1,185 @@
 
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.23;
+
+import "../../../DataTypes.sol";
+import { IPolicy, IUserOpPolicy, VALIDATION_SUCCESS, VALIDATION_FAILED } from "../../../interfaces/IPolicy.sol";
+import { PackedUserOperation } from "modulekit/external/ERC4337.sol";
+import { IERC165 } from "forge-std/interfaces/IERC165.sol";
+import { IERC7579Account } from "erc7579/interfaces/IERC7579Account.sol";
+import { IAccountExecute } from "modulekit/external/ERC4337.sol";
+import { ExecType, CallType, CALLTYPE_BATCH, CALLTYPE_SINGLE, EXECTYPE_DEFAULT } from "erc7579/lib/ModeLib.sol";
+import { IERC20 } from "forge-std/interfaces/IERC20.sol";
+import { Execution, ExecutionLib as ExecutionLib } from "../../../lib/ExecutionLib.sol";
+import { ISmartSession } from "../../../ISmartSession.sol";
+import { ConfigLib } from "../../../lib/ConfigLib.sol";
+
+
+interface IUserOpPolicyVerifier {
+    function verifyProof(
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint[13] memory input
+    ) external view returns (bool);
+}
+
+contract ContractValueWhitelistPolicy is IUserOpPolicy {
+
+    using ExecutionLib for *;
+
+    error PolicyNotInitialized(ConfigId id, address multiplexer, address account);
+    error UnsupportedCallType(CallType callType);
+
+
+    mapping(ConfigId id => mapping(address msgSender => mapping(address userOpSender => uint256))) internal stateTreeRoots;
+
+    uint256 immutable SNARK_SCALAR_FIELD = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
+
+    IUserOpPolicyVerifier private immutable userOpPolicyVerifier;
+
+    constructor(IUserOpPolicyVerifier _userOpPolicyVerifier){
+        userOpPolicyVerifier = _userOpPolicyVerifier;
+    }
+
+    /**
+     * Initializes the policy to be used by given account through multiplexer (msg.sender) such as Smart Sessions.
+     * Overwrites state.
+     * @notice ATTENTION: This method is called during permission installation as part of the enabling policies flow.
+     * A secure policy would minimize external calls from this method (ideally, to 0) to prevent passing control flow to
+     * external contracts.
+     */
+    function initializeWithMultiplexer(address account, ConfigId configId, bytes calldata initData) external {
+        stateTreeRoots[configId][msg.sender][account] = uint256(bytes32(initData[0:32]));
+    }
+
+    function updateSmartAccountStateTreeRoot(ConfigId configId, address multiplexer, uint256 newStateTreeRoot) external {
+        require(stateTreeRoots[configId][multiplexer][msg.sender] > 0, PolicyNotInitialized(configId, multiplexer, msg.sender));
+        stateTreeRoots[configId][multiplexer][msg.sender] = newStateTreeRoot;
+    }
+
+
+    function getSmartAccountStateTreeRoot(ConfigId configId, address multiplexer, address smartAccount) external view returns (uint256){
+        return stateTreeRoots[configId][multiplexer][smartAccount];
+    }
+
+    /**
+     * @notice Checks if the limit is not exceeded.
+     * @param id The config ID.
+     * @param op The user operation.
+     * @return The validation result.
+     */
+    //function checkUserOpPolicy(ConfigId id, PackedUserOperation calldata op, bytes32 userOpHash, bytes proof) external returns (uint256) {
+    function checkUserOpPolicy(ConfigId id, PackedUserOperation calldata op) external returns (uint256) {
+        return _verifyProof(id, msg.sender, op.sender, op);
+    }
+
+     /**
+     * @notice Internal method to check if the limit is not exceeded.
+     * @param id The config ID.
+     * @param multiplexer The multiplexer.
+     * @param smartAccount The smart account.
+     * @return The validation result.
+     */
+    function _verifyProof(ConfigId id, address multiplexer, address smartAccount, PackedUserOperation calldata op) internal returns (uint256) {
+        uint256 treeRoot = stateTreeRoots[id][multiplexer][smartAccount];
+        require(treeRoot > 0, PolicyNotInitialized(id, multiplexer, smartAccount));
+        uint256[] memory input = _decodeUserOpCallData(op.callData);
+        input[0] = treeRoot;
+        //input[1] = userOpProof;
+        input[2] = uint256(uint160(address(smartAccount)));
+        input[3] = uint256(ConfigId.unwrap(id));
+        //input[4] = userOpHash;
+
+        //We need userOp hash to prevent re-play attack on the proof(it has the same behavior as signature)
+        //Pass proof as parameter || decode proof
+        //The need for new policy type
+
+        /*if(! userOpPolicyVerifier.verifyProof(zKSessionSignatureAndProof.a, zKSessionSignatureAndProof.b, zKSessionSignatureAndProof.c, input)){
+            return VALIDATION_FAILED;
+        }*/
+        return VALIDATION_SUCCESS;
+    }
+
+
+    function _decodeUserOpCallData(bytes calldata userOpCallData) internal pure returns (uint256[] memory) {
+        uint256[] memory callsInputs = new uint256[](13);
+        bytes4 selector = bytes4(userOpCallData[0:4]);
+        if (selector == IERC7579Account.execute.selector) {
+            // Decode ERC7579 execution mode
+            (CallType callType, ) = userOpCallData.get7579ExecutionTypes();
+            
+            // DEFAULT EXEC & SINGLE CALL
+            if (callType == CALLTYPE_SINGLE) {
+                (address target, uint256 value, bytes calldata callData) = userOpCallData.decodeUserOpCallData().decodeSingle();
+                address to = _tokenTransferOrApprove(callData);
+                callsInputs[5] = uint256(uint160(target));
+                callsInputs[7] = value;
+                callsInputs[9] = uint256(uint32(bytes4(callData[:4])));
+                callsInputs[11] = uint256(uint160(to));
+            }
+            // DEFAULT EXEC & BATCH CALL
+            else if (callType == CALLTYPE_BATCH) {
+                // Decode the batch of 7579 executions from the user operation's call data
+                Execution[] calldata executions = userOpCallData.decodeUserOpCallData().decodeBatch();
+                uint256 length = executions.length;
+                // Revert if there are no executions in the batch
+                if (length == 0) revert ISmartSession.NoExecutionsInBatch();
+
+                //only support: tx < 3 just for testing purpose 
+                require(length < 3, "nb tx must be less than 3");
+
+                uint256 valueIndex= 5 + length; 
+                uint256 functionSelectorIndex= 5 + length * 2;
+                uint256 toIndex= 5 + length * 3;
+                // Iterate through each execution in the batch
+                for (uint256 i; i < length; i++) {
+                    Execution calldata execution = executions[i];
+                    callsInputs[5+i] = uint256(uint160(execution.target));
+                    callsInputs[valueIndex+i] = execution.value;
+                    callsInputs[functionSelectorIndex+i] = uint256(uint32(bytes4(execution.callData[:4])));
+                    address to = _tokenTransferOrApprove(execution.callData);
+                    callsInputs[toIndex+i] = uint256(uint160(to));
+                }
+            }
+            else {
+                revert UnsupportedCallType(callType);
+            }
+        }
+        return callsInputs;
+    }
+
+     function _tokenTransferOrApprove(
+        bytes calldata callData
+    )
+        internal
+        pure
+        returns (address)
+    {
+         bytes4 functionSelector = bytes4(callData[0:4]);
+
+        if (functionSelector == IERC20.approve.selector) {
+            (address to, ) = abi.decode(callData[4:], (address, uint256));
+            return to;
+        } else if (functionSelector == bytes4(keccak256("increaseAllowance(address,uint256)"))) {
+            (address to, ) = abi.decode(callData[4:], (address, uint256));
+            return to;
+        } else if (functionSelector == IERC20.transfer.selector) {
+            (address to, ) = abi.decode(callData[4:], (address, uint256));
+            return to;
+        } else if (functionSelector == IERC20.transferFrom.selector) {
+            ( , address to, ) = abi.decode(callData[4:], (address, address, uint256));
+            return to;
+        }
+        return address(0);
+    }
+
+    function supportsInterface(bytes4 interfaceID) external pure override returns (bool) {
+        return (
+            interfaceID == type(IERC165).interfaceId || interfaceID == type(IPolicy).interfaceId
+                || interfaceID == type(IUserOpPolicy).interfaceId
+        );
+    }
+}
+    

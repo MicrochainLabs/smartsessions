@@ -7,7 +7,7 @@ include "./operation_hasher.circom";
 template ContractValueWhitelistPolicy(transactionNumber, smartContractCallTreeLevel, valueTransferTreeLevel) {
 
     signal input smartAccount;
-    signal input permissionId;
+    signal input configId;
     signal input contractWhitelistRoot;
     signal input valueWhitelistRoot; 
     signal input userOpHash;
@@ -41,7 +41,7 @@ template ContractValueWhitelistPolicy(transactionNumber, smartContractCallTreeLe
     //Compute permission tree root
     component permissionTree01 = Poseidon(2);
     permissionTree01.inputs[0] <== smartAccount;
-    permissionTree01.inputs[1] <== permissionId;
+    permissionTree01.inputs[1] <== configId;
 
     component permissionTree23 = Poseidon(2);
     permissionTree23.inputs[0] <== contractWhitelistRoot;
@@ -120,7 +120,7 @@ template ContractValueWhitelistPolicy(transactionNumber, smartContractCallTreeLe
 
 
     component operationHasher = OperationHasher();
-    smartAccountPermission <== smartAccount + permissionId;
+    smartAccountPermission <== smartAccount + configId;
     operationHasher.accountIdentifier <== smartAccountPermission;
     operationHasher.secret <== permissionRoot;
     operationHasher.op <== userOpHash;
@@ -129,4 +129,4 @@ template ContractValueWhitelistPolicy(transactionNumber, smartContractCallTreeLe
 
 }
 
-component main {public [smartAccount, permissionId, userOpHash, dest, value, functionSelector, erc20TransferTo]} = ContractValueWhitelistPolicy(2, 17, 17);
+component main {public [smartAccount, configId, userOpHash, dest, value, functionSelector, erc20TransferTo]} = ContractValueWhitelistPolicy(2, 17, 17);
