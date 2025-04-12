@@ -55,7 +55,7 @@ contract ContractValueWhitelistPolicy is IUserOpPolicy {
         stateTreeRoots[configId][msg.sender][account] = uint256(bytes32(initData[0:32]));
     }
 
-    function updateSmartAccountStateTreeRoot(
+    function updateStateTreeRoot(
         ConfigId configId,
         address multiplexer,
         uint256 newStateTreeRoot
@@ -69,7 +69,7 @@ contract ContractValueWhitelistPolicy is IUserOpPolicy {
         stateTreeRoots[configId][multiplexer][msg.sender] = newStateTreeRoot;
     }
 
-    function getSmartAccountStateTreeRoot(
+    function getStateTreeRoot(
         ConfigId configId,
         address multiplexer,
         address smartAccount
@@ -109,10 +109,10 @@ contract ContractValueWhitelistPolicy is IUserOpPolicy {
         internal
         returns (uint256)
     {
-        uint256 treeRoot = stateTreeRoots[id][multiplexer][smartAccount];
-        require(treeRoot > 0, PolicyNotInitialized(id, multiplexer, smartAccount));
+        uint256 stateTreeRoot = stateTreeRoots[id][multiplexer][smartAccount];
+        require(stateTreeRoot > 0, PolicyNotInitialized(id, multiplexer, smartAccount));
         uint256[] memory input = _decodeUserOpCallData(op.callData);
-        input[0] = treeRoot;
+        input[0] = stateTreeRoot;
         //input[1] = userOpProof;
         input[2] = uint256(uint160(address(smartAccount)));
         input[3] = uint256(ConfigId.unwrap(id));
