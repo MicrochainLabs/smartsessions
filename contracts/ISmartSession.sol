@@ -120,6 +120,7 @@ interface ISmartSession {
     function enableERC1271Policies(PermissionId permissionId, ERC7739Data calldata erc1271Policies) external;
     function enableSessions(Session[] memory sessions) external returns (PermissionId[] memory permissionIds);
     function enableUserOpPolicies(PermissionId permissionId, PolicyData[] memory userOpPolicies) external;
+    function enableUserOpZkPolicies(PermissionId permissionId, PolicyData[] memory userOpPolicies) external;
     function disableActionPolicies(PermissionId permissionId, ActionId actionId, address[] memory policies) external;
     function disableActionId(PermissionId permissionId, ActionId actionId) external;
     function disableERC1271Policies(
@@ -129,6 +130,7 @@ interface ISmartSession {
     )
         external;
     function disableUserOpPolicies(PermissionId permissionId, address[] memory policies) external;
+    function disableUserOpZkPolicies(PermissionId permissionId, address[] memory policies) external;
     function removeSession(PermissionId permissionId) external;
     function revokeEnableSignature(PermissionId permissionId) external;
 

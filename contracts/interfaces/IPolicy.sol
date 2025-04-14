@@ -54,7 +54,14 @@ interface IUserOpPolicy is IPolicy {
  *   SmartSession Policies can not utilize aggregator addresses. (PolicyLib.isFailed() will prevent this)
  */
 interface IUserOpZkPolicy is IPolicy {
-    function checkUserOpZkPolicy(ConfigId id, PackedUserOperation calldata userOp, bytes32 userOpHash, bytes calldata proof) external returns (uint256);
+    function checkUserOpZkPolicy(
+        ConfigId id,
+        PackedUserOperation calldata userOp,
+        bytes32 userOpHash,
+        bytes calldata proof
+    )
+        external
+        returns (uint256);
 }
 
 /**

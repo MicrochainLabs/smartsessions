@@ -121,6 +121,39 @@ abstract contract SmartSessionBase is ISmartSession, NonceManager {
         });
     }
 
+    /**
+     * @notice Enable user operation ZK policies for a specific permission
+     * @dev This function allows adding or updating user operation policies
+     * @param permissionId The unique identifier for the permission
+     * @param userOpZkPolicies An array of PolicyData structures containing policy information
+     */
+    function enableUserOpZkPolicies(PermissionId permissionId, PolicyData[] memory userOpZkPolicies) public enableWithPermissionId(permissionId){
+         // Enable the specified user operation ZK policies
+        $userOpZkPolicies.enable({
+            policyType: PolicyType.USER_OP_ZK,
+            permissionId: permissionId,
+            configId: permissionId.toUserOpPolicyId().toConfigId(),
+            policyDatas: userOpZkPolicies,
+            useRegistry: true
+        });
+    }
+
+    /**
+     * @notice Disable specific user operation ZK policies for a given permission
+     * @param permissionId The unique identifier for the permission
+     * @param policies An array of policy addresses to be disabled
+     */
+    function disableUserOpZkPolicies(PermissionId permissionId, address[] calldata policies) public disableWithPermissionId(permissionId){
+        // Disable the specified user operation ZK policies
+        $userOpZkPolicies.disable({
+            policyType: PolicyType.USER_OP_ZK,
+            smartAccount: msg.sender,
+            permissionId: permissionId,
+            policies: policies
+        });
+    }
+
+
     function setPermit4337Paymaster(PermissionId permissionId, bool enabled) external {
         $enabledSessions.requirePermissionIdEnabled(permissionId);
         _setPermit4337Paymaster(permissionId, enabled);
@@ -291,6 +324,15 @@ abstract contract SmartSessionBase is ISmartSession, NonceManager {
                 useRegistry: useRegistry
             });
 
+             // Enable UserOp ZK policies
+            $userOpZkPolicies.enable({
+                policyType: PolicyType.USER_OP_ZK,
+                permissionId: permissionId,
+                configId: permissionId.toUserOpPolicyId().toConfigId(),
+                policyDatas: session.userOpZkPolicies,
+                useRegistry: useRegistry
+            });
+
             // Enable ERC1271 policies
             $erc1271Policies.enable({
                 policyType: PolicyType.ERC1271,
@@ -336,6 +378,10 @@ abstract contract SmartSessionBase is ISmartSession, NonceManager {
 
         // Remove all UserOp policies for this session
         $userOpPolicies.policyList[permissionId].removeAll(msg.sender);
+
+        // Remove all UserOp ZK policies for this session
+        $userOpZkPolicies.policyList[permissionId].removeAll(msg.sender);
+
 
         // Remove all ERC1271 policies for this session
         $erc1271Policies.policyList[permissionId].removeAll(msg.sender);
@@ -469,6 +515,22 @@ abstract contract SmartSessionBase is ISmartSession, NonceManager {
         });
     }
 
+    function areUserOpZkPoliciesEnabled(
+        address account,
+        PermissionId permissionId,
+        PolicyData[] calldata userOpZkPolicies
+    )
+        external
+        view
+        returns (bool)
+    {
+        return $userOpZkPolicies.areEnabled({
+            permissionId: permissionId,
+            smartAccount: account,
+            policyDatas: userOpZkPolicies
+        });
+    }
+
     // This function accepts not the array of policies, but full PolicyData,
     // So it is easier to use it with an EnableSessions object
     function areERC1271PoliciesEnabled(
@@ -515,6 +577,18 @@ abstract contract SmartSessionBase is ISmartSession, NonceManager {
         returns (bool)
     {
         return $userOpPolicies.policyList[permissionId].contains(account, policy);
+    }
+
+     function isUserOpZkPolicyEnabled(
+        address account,
+        PermissionId permissionId,
+        address policy
+    )
+        external
+        view
+        returns (bool)
+    {
+        return $userOpZkPolicies.policyList[permissionId].contains(account, policy);
     }
 
     function isERC1271PolicyEnabled(
@@ -573,6 +647,10 @@ abstract contract SmartSessionBase is ISmartSession, NonceManager {
 
     function getUserOpPolicies(address account, PermissionId permissionId) external view returns (address[] memory) {
         return $userOpPolicies.policyList[permissionId].values(account);
+    }
+
+    function getUserOpZkPolicies(address account, PermissionId permissionId) external view returns (address[] memory) {
+        return $userOpZkPolicies.policyList[permissionId].values(account);
     }
 
     function getERC1271Policies(address account, PermissionId permissionId) external view returns (address[] memory) {
