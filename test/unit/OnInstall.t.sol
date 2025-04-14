@@ -30,6 +30,7 @@ contract OnInstallTest is BaseTest {
             salt: keccak256("salt"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
+            userOpZkPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
             erc7739Policies: _getEmptyERC7739Data("mockContent", _getEmptyPolicyDatas(address(yesPolicy))),
             actions: _getEmptyActionDatas(makeAddr("target"), bytes4(0x41414141), address(yesPolicy)),
             permitERC4337Paymaster: true

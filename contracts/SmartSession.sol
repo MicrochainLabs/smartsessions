@@ -168,6 +168,15 @@ contract SmartSession is ISmartSession, SmartSessionBase, SmartSessionERC7739 {
             useRegistry: useRegistry
         });
 
+        // Enable UserOp ZK policies
+        $userOpZkPolicies.enable({
+            policyType: PolicyType.USER_OP_ZK,
+            permissionId: permissionId,
+            configId: permissionId.toUserOpPolicyId().toConfigId(),
+            policyDatas: enableData.sessionToEnable.userOpZkPolicies,
+            useRegistry: useRegistry
+        });
+
         // Enable ERC1271 policies
         $enabledERC7739.enable({
             contexts: enableData.sessionToEnable.erc7739Policies.allowedERC7739Content,

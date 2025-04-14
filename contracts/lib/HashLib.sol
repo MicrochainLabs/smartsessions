@@ -206,6 +206,7 @@ library HashLib {
                 ignoreSecurityAttestations, // ignoreSecurityAttestations
                 session.permitERC4337Paymaster, // permitERC4337Paymaster
                 session.userOpPolicies.hashPolicyDataArray(), // userOpPolicies
+                session.userOpZkPolicies.hashPolicyDataArray(), // userOpZkPolicies
                 session.erc7739Policies.hashERC7739Data(), // erc7739Policies
                 actionDataArrayHash // actions
             )

@@ -79,6 +79,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             salt: keccak256("salt"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: userOpPolicies,
+            userOpZkPolicies: userOpPolicies,
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: actionDatas,
             permitERC4337Paymaster: true
@@ -101,6 +102,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             salt: keccak256("salt2"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: onlyUserOpPolicies,
+            userOpZkPolicies: onlyUserOpPolicies,
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: new ActionData[](0), // Empty action data array
             permitERC4337Paymaster: true

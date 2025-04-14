@@ -58,6 +58,7 @@ struct Session {
     bytes sessionValidatorInitData;
     bytes32 salt;
     PolicyData[] userOpPolicies;
+    PolicyData[] userOpZkPolicies;
     ERC7739Data erc7739Policies;
     ActionData[] actions;
     bool permitERC4337Paymaster;
@@ -183,6 +184,7 @@ uint256 constant ERC7579_MODULE_TYPE_STATELESS_VALIDATOR = 7;
 enum PolicyType {
     NA,
     USER_OP,
+    USER_OP_ZK,
     ACTION,
     ERC1271
 }

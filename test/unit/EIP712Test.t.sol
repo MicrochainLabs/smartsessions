@@ -137,6 +137,7 @@ contract EIP712Test is Test {
             sessionValidatorInitData: "",
             salt: bytes32(0),
             userOpPolicies: policyDatas,
+            userOpZkPolicies: policyDatas,
             erc7739Policies: _getEmptyERC7739Data("mockContent", _getEmptyPolicyDatas(address(0))),
             actions: actions,
             permitERC4337Paymaster: true

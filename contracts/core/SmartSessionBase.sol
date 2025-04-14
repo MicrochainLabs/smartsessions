@@ -37,6 +37,7 @@ abstract contract SmartSessionBase is ISmartSession, NonceManager {
      * storage.
      */
     Policy internal $userOpPolicies;
+    Policy internal $userOpZkPolicies;
     Policy internal $erc1271Policies;
     EnumerableActionPolicy internal $actionPolicies;
     EnumerableSet.Bytes32Set internal $enabledSessions;

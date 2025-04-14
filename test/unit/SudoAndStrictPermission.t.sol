@@ -47,6 +47,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             salt: keccak256("salt"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: new PolicyData[](0),
+            userOpZkPolicies: new PolicyData[](0),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: actionDatas,
             permitERC4337Paymaster: true
@@ -66,6 +67,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             salt: keccak256("salt and pepper"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
+            userOpZkPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             //actions: actionDatas
             actions: new ActionData[](0),
@@ -92,6 +94,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             salt: keccak256("salt and pepper explicit"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
+            userOpZkPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: actionDatas,
             permitERC4337Paymaster: true

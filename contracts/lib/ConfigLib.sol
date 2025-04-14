@@ -2,7 +2,7 @@
 pragma solidity ^0.8.25;
 
 import "../DataTypes.sol";
-import { IPolicy, IUserOpPolicy, IActionPolicy, I1271Policy } from "../interfaces/IPolicy.sol";
+import { IPolicy, IUserOpPolicy, IActionPolicy, I1271Policy, IUserOpZkPolicy } from "../interfaces/IPolicy.sol";
 import { ISmartSession } from "../ISmartSession.sol";
 import { ModuleType } from "../interfaces/IRegistry.sol";
 import { EnumerableMap } from "../utils/EnumerableMap4337.sol";
@@ -25,6 +25,8 @@ library ConfigLib {
         bool supportsInterface;
         if (policyType == PolicyType.USER_OP) {
             supportsInterface = policy.supportsInterface(type(IUserOpPolicy).interfaceId);
+        } else if (policyType == PolicyType.USER_OP_ZK) {
+            supportsInterface = policy.supportsInterface(type(IUserOpZkPolicy).interfaceId);
         } else if (policyType == PolicyType.ACTION) {
             supportsInterface = policy.supportsInterface(type(IActionPolicy).interfaceId);
         } else if (policyType == PolicyType.ERC1271) {
