@@ -58,7 +58,7 @@ interface IUserOpZkPolicy is IPolicy {
         ConfigId id,
         PackedUserOperation calldata userOp,
         bytes32 userOpHash,
-        bytes calldata proof
+        bytes memory proof
     )
         external
         returns (uint256);

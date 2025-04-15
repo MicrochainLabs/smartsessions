@@ -23,3 +23,6 @@ node_modules/
 #ds store
 .DS_Store
 
+
+/contracts/external/off-chain-policies/contractAndValueWhitelistPolicy/circuits/build
+

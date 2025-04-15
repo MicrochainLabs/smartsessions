@@ -276,7 +276,7 @@ contract SmartSession is ISmartSession, SmartSessionBase, SmartSessionERC7739 {
                 minPolicies: minPolicies
             });
 
-              /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+            /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
             /*                    Check UserOp ZK Policies                   */
             /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
             // Check UserOp ZK policies

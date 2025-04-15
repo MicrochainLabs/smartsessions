@@ -3,7 +3,7 @@ pragma solidity ^0.8.25;
 
 import "../DataTypes.sol";
 import { ISmartSession } from "../ISmartSession.sol";
-import { IPolicy, IActionPolicy, I1271Policy, IUserOpZkPolicy} from "../interfaces/IPolicy.sol";
+import { IPolicy, IActionPolicy, I1271Policy, IUserOpZkPolicy } from "../interfaces/IPolicy.sol";
 
 import { Execution, ExecutionLib as ExecutionLib } from "./ExecutionLib.sol";
 import { ValidationDataLib } from "./ValidationDataLib.sol";
@@ -91,13 +91,12 @@ library PolicyLib {
         internal
         returns (ValidationData vd)
     {
-        
         // Get the list of policies for the given permissionId and account
         address[] memory policies = $self.policyList[permissionId].values({ account: msg.sender });
         uint256 length = policies.length;
 
         // proofs consistency
-         if ((proofs.length - 1) != length) {
+        if ((proofs.length - 1) != length) {
             revert ISmartSession.InconsistentProofs(permissionId);
         }
 
@@ -111,7 +110,8 @@ library PolicyLib {
         // Iterate over all policies and intersect the validation data
         for (uint256 i; i < length; i++) {
             bytes memory callOnIPolicy = abi.encodeCall(
-                IUserOpZkPolicy.checkUserOpZkPolicy, (permissionId.toUserOpPolicyId().toConfigId(), userOp, userOpHash, proofs[i+1])
+                IUserOpZkPolicy.checkUserOpZkPolicy,
+                (permissionId.toUserOpPolicyId().toConfigId(), userOp, userOpHash, proofs[i + 1])
             );
             // Intersect the validation data from this policy with the accumulated result
             vd = vd.intersect(policies[i].callPolicy(permissionId, callOnIPolicy));
