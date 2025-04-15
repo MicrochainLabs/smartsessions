@@ -41,6 +41,7 @@ interface ISmartSession {
     error InvalidMode();
     error InvalidUserOpSender(address sender);
     error NoPoliciesSet(PermissionId permissionId);
+    error InconsistentProofs(PermissionId permissionId);
     error PartlyEnabledActions();
     error PartlyEnabledPolicies();
     error PolicyViolation(PermissionId permissionId, address policy);

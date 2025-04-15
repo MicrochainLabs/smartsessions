@@ -3,7 +3,7 @@ pragma solidity ^0.8.25;
 
 import "../DataTypes.sol";
 import { ISmartSession } from "../ISmartSession.sol";
-import { IPolicy, IActionPolicy, I1271Policy } from "../interfaces/IPolicy.sol";
+import { IPolicy, IActionPolicy, I1271Policy, IUserOpZkPolicy} from "../interfaces/IPolicy.sol";
 
 import { Execution, ExecutionLib as ExecutionLib } from "./ExecutionLib.sol";
 import { ValidationDataLib } from "./ValidationDataLib.sol";
@@ -72,6 +72,47 @@ library PolicyLib {
 
         // Iterate over all policies and intersect the validation data
         for (uint256 i; i < length; i++) {
+            // Intersect the validation data from this policy with the accumulated result
+            vd = vd.intersect(policies[i].callPolicy(permissionId, callOnIPolicy));
+        }
+    }
+
+    /**
+     * Multi-purpose helper function that interacts with external ZK Policy Contracts.
+     */
+    function checkProofs(
+        Policy storage $self,
+        PermissionId permissionId,
+        uint256 minPolicies,
+        PackedUserOperation calldata userOp,
+        bytes32 userOpHash,
+        bytes[] memory proofs
+    )
+        internal
+        returns (ValidationData vd)
+    {
+        
+        // Get the list of policies for the given permissionId and account
+        address[] memory policies = $self.policyList[permissionId].values({ account: msg.sender });
+        uint256 length = policies.length;
+
+        // proofs consistency
+         if ((proofs.length - 1) != length) {
+            revert ISmartSession.InconsistentProofs(permissionId);
+        }
+
+        // Ensure the minimum number of policies is met.
+        // Revert otherwise. Current minPolicies for userOp policies is 0.
+        // Current minPolicies for action policies is 1.
+        // This ensures sudo (open) permissions can be created only by explicitly setting SudoPolicy/YesPolicy
+        // as the only action policies
+        if (minPolicies > length) revert ISmartSession.NoPoliciesSet(permissionId);
+
+        // Iterate over all policies and intersect the validation data
+        for (uint256 i; i < length; i++) {
+            bytes memory callOnIPolicy = abi.encodeCall(
+                IUserOpZkPolicy.checkUserOpZkPolicy, (permissionId.toUserOpPolicyId().toConfigId(), userOp, userOpHash, proofs[i+1])
+            );
             // Intersect the validation data from this policy with the accumulated result
             vd = vd.intersect(policies[i].callPolicy(permissionId, callOnIPolicy));
         }

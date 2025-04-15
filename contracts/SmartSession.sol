@@ -15,7 +15,7 @@ import { SmartSessionERC7739 } from "./core/SmartSessionERC7739.sol";
 
 import { EnumerableSet } from "./utils/EnumerableSet4337.sol";
 import { ExecutionLib as ExecutionLib } from "./lib/ExecutionLib.sol";
-import { IUserOpPolicy, IActionPolicy } from "./interfaces/IPolicy.sol";
+import { IUserOpPolicy, IActionPolicy, IUserOpZkPolicy } from "./interfaces/IPolicy.sol";
 import { PolicyLib } from "./lib/PolicyLib.sol";
 import { SignerLib } from "./lib/SignerLib.sol";
 import { ConfigLib } from "./lib/ConfigLib.sol";
@@ -245,6 +245,9 @@ contract SmartSession is ISmartSession, SmartSessionBase, SmartSessionERC7739 {
             revert InvalidPermissionId(permissionId);
         }
 
+        //Format: 0: signature(session validator), 1..n proofs
+        bytes[] memory signatureAndProofs = abi.decode(decompressedSignature, (bytes[]));
+
         /* --- Scope: Check UserOp Policies --- */
         {
             // by default, minPolicies for userOp policies is 0
@@ -272,6 +275,21 @@ contract SmartSession is ISmartSession, SmartSessionBase, SmartSessionERC7739 {
                 ),
                 minPolicies: minPolicies
             });
+
+              /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+            /*                    Check UserOp ZK Policies                   */
+            /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+            // Check UserOp ZK policies
+            // This reverts if policies are violated
+            vd = vd.intersect(
+                $userOpZkPolicies.checkProofs({
+                    permissionId: permissionId,
+                    minPolicies: minPolicies,
+                    userOp: userOp,
+                    userOpHash: userOpHash,
+                    proofs: signatureAndProofs
+                })
+            );
         }
         /* --- End Scope: Check UserOp Policies --- */
 
@@ -358,7 +376,7 @@ contract SmartSession is ISmartSession, SmartSessionBase, SmartSessionERC7739 {
             hash: userOpHash,
             account: account,
             permissionId: permissionId,
-            signature: decompressedSignature
+            signature: signatureAndProofs[0]
         });
 
         // if the ISessionValidator signature is invalid, the userOp is invalid
