@@ -82,7 +82,15 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
      */
     //function checkUserOpPolicy(ConfigId id, PackedUserOperation calldata op, bytes32 userOpHash, bytes proof) external
     // returns (uint256) {
-    function checkUserOpZkPolicy(ConfigId id, PackedUserOperation calldata op, bytes32 userOpHash, bytes memory proof) external returns (uint256) {
+    function checkUserOpZkPolicy(
+        ConfigId id,
+        PackedUserOperation calldata op,
+        bytes32 userOpHash,
+        bytes memory proof
+    )
+        external
+        returns (uint256)
+    {
         return _verifyProof(id, msg.sender, op.sender, op, userOpHash, proof);
     }
 
@@ -114,13 +122,13 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
         inputs[3] = uint256(ConfigId.unwrap(id));
         inputs[4] = uint256(userOpHash) % SNARK_SCALAR_FIELD;
 
-        if(!userOpPolicyVerifier.verifyProof(groth16Proof.a, groth16Proof.b, groth16Proof.c, inputs)){
+        if (!userOpPolicyVerifier.verifyProof(groth16Proof.a, groth16Proof.b, groth16Proof.c, inputs)) {
             return VALIDATION_FAILED;
         }
         return VALIDATION_SUCCESS;
     }
 
-    function _decodeProof(bytes memory proof) public pure returns(Groth16Proof memory decodedProof ) {
+    function _decodeProof(bytes memory proof) public pure returns (Groth16Proof memory decodedProof) {
         {
             (
                 uint256 proof0,
@@ -133,7 +141,8 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
                 uint256 proof7,
                 uint256 opProof
             ) = abi.decode(proof, (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256));
-            decodedProof = Groth16Proof([proof0, proof1],[[proof2, proof3], [proof4, proof5]], [proof6, proof7], opProof);
+            decodedProof =
+                Groth16Proof([proof0, proof1], [[proof2, proof3], [proof4, proof5]], [proof6, proof7], opProof);
         }
     }
 

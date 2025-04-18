@@ -163,10 +163,10 @@ contract EIP712Test is Test {
         console2.log("helper addr:", address(helper));
 
         bytes32 hashPermissions = session.hashPermissions(false);
-        bytes32 expectedPermissionsHash = 0xc2d2c0d689188f83a8bcd8f712ac5d99592c650dd4b11aa3854069bd63e366ea;
+        bytes32 expectedPermissionsHash = 0xd662c8d6314c319dca96c8d90ade08ff62129802c501d5ab4766a85f2e27e63b;
         assertEq(hashPermissions, expectedPermissionsHash, "hash permission");
 
-        bytes32 expectedSessionHash = 0xfe5ab8aab1e51d73d0ff471e7bc35458db292e47e8edcca72bab35a26bde6460;
+        bytes32 expectedSessionHash = 0xed04f29ae15474008bba5de8aa5ade92f74aad470d2299f7d45c122e421d3486;
 
         bytes32 hash = helper.hash(session);
         // bytes32 expected_hash = 0x4e1b5958b515b1750b96d520eccbb89236e76222301abc68a037111e2efa6687;

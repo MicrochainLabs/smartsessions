@@ -21,6 +21,7 @@ sol! {
         bytes sessionValidatorInitData;
         bytes32 salt;
         PolicyData[] userOpPolicies;
+        PolicyData[] userOpZkPolicies;
         ERC7739Data erc7739Policies;
         ActionData[] actions;
         bool permitERC4337Paymaster;
@@ -35,6 +36,7 @@ sol! {
         bool ignoreSecurityAttestations;
         bool permitERC4337Paymaster;
         PolicyData[] userOpPolicies;
+        PolicyData[] userOpZkPolicies;
         ERC7739Data erc7739Policies;
         ActionData[] actions;
     }
@@ -137,6 +139,7 @@ pub fn to_signed_session(session: Session, account: Address, smart_session: Addr
         ignoreSecurityAttestations: false,
         permitERC4337Paymaster: session.permitERC4337Paymaster,
         userOpPolicies: session.userOpPolicies,
+        userOpZkPolicies: session.userOpZkPolicies,
         erc7739Policies: session.erc7739Policies,
         actions: session.actions,
     };

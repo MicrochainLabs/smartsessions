@@ -46,6 +46,7 @@ pub fn mock_session() -> Session {
         sessionValidatorInitData: Bytes::default(),
         salt: FixedBytes::<32>::default(),
         userOpPolicies: vec![mock_policy_data()],
+        userOpZkPolicies: vec![mock_policy_data()],
         erc7739Policies: mock_erc7739_data(),
         actions: vec![mock_action_data()],
         permitERC4337Paymaster: true
