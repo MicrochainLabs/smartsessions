@@ -8,6 +8,8 @@ import { IAccountExecute } from "modulekit/external/ERC4337.sol";
 import { PackedUserOperation } from "modulekit/external/ERC4337.sol";
 import { EIP1271_MAGIC_VALUE, IERC1271 } from "module-bases/interfaces/IERC1271.sol";
 import { ExecType, CallType, CALLTYPE_BATCH, CALLTYPE_SINGLE, EXECTYPE_DEFAULT } from "erc7579/lib/ModeLib.sol";
+import { LibZip } from "solady/utils/LibZip.sol";
+
 
 import { ISmartSession } from "./ISmartSession.sol";
 import { SmartSessionBase } from "./core/SmartSessionBase.sol";
@@ -52,6 +54,7 @@ contract SmartSession is ISmartSession, SmartSessionBase, SmartSessionERC7739 {
     using ConfigLib for *;
     using ExecutionLib for *;
     using EncodeLib for *;
+    using LibZip for bytes;
 
     /**
      * @notice Validates a user operation for ERC4337/ERC7579 compatibility
@@ -93,7 +96,7 @@ contract SmartSession is ISmartSession, SmartSessionBase, SmartSessionERC7739 {
                 permissionId: permissionId,
                 userOpHash: userOpHash,
                 userOp: userOp,
-                decompressedSignature: packedSig,
+                decompressedSignature: packedSig.flzDecompress(),
                 account: account
             });
         }
