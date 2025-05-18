@@ -54,7 +54,7 @@ contract SpendingLimitTest is BaseTest {
             salt: keccak256("salt"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
-            userOpZkPolicies: new PolicyData[](0),//_getEmptyPolicyDatas(address(yesPolicy)),
+            userOpZkPolicies: new PolicyData[](0),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: actionDatas,
             permitERC4337Paymaster: true
@@ -84,7 +84,8 @@ contract SpendingLimitTest is BaseTest {
         // Encode the array using ABI encoding
         bytes memory compressedData = abi.encode(signatureAndProof);
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: compressedData.flzCompress() });
+        userOpData.userOp.signature =
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: compressedData.flzCompress() });
         userOpData.execUserOps();
         assertEq(token.balanceOf(recipient), 1 ether);
 
