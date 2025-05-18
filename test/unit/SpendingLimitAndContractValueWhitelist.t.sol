@@ -8,7 +8,7 @@ import "contracts/external/policies/ERC20SpendingLimitPolicy.sol";
 import "solmate/test/utils/mocks/MockERC20.sol";
 import "forge-std/interfaces/IERC20.sol";
 
-contract SpendingLimitTest is BaseTest {
+contract SpendingLimitAndContractValueWhitelistTest is BaseTest {
     using IdLib for *;
     using ModuleKitHelpers for *;
     using ModuleKitUserOp for *;
@@ -54,7 +54,7 @@ contract SpendingLimitTest is BaseTest {
             salt: keccak256("salt"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
-            userOpZkPolicies: new PolicyData[](0),//_getEmptyPolicyDatas(address(yesPolicy)),
+            userOpZkPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: actionDatas,
             permitERC4337Paymaster: true
@@ -78,8 +78,9 @@ contract SpendingLimitTest is BaseTest {
             callData: abi.encodeCall(IERC20.transfer, (recipient, 1 ether)),
             txValidator: address(smartSession)
         });
-        bytes[] memory signatureAndProof = new bytes[](1);
+        bytes[] memory signatureAndProof = new bytes[](2);
         signatureAndProof[0] = hex"4141414141";
+        signatureAndProof[1] = hex"4141414141";
 
         // Encode the array using ABI encoding
         bytes memory compressedData = abi.encode(signatureAndProof);

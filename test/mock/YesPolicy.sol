@@ -8,11 +8,14 @@ import "contracts/lib/SubModuleLib.sol";
 import "contracts/DataTypes.sol";
 import "forge-std/console2.sol";
 
-contract YesPolicy is IUserOpPolicy, IActionPolicy, I1271Policy {
+contract YesPolicy is IUserOpPolicy, IUserOpZkPolicy, IActionPolicy, I1271Policy {
     using SubModuleLib for bytes;
 
     mapping(ConfigId id => mapping(address msgSender => mapping(address userOpSender => uint256 calls))) public
         userOpState;
+
+    mapping(ConfigId id => mapping(address msgSender => mapping(address userOpSender => uint256 calls))) public
+        zkUserOpState;
 
     mapping(ConfigId id => mapping(address msgSender => mapping(address userOpSender => uint256 calls))) public
         actionState;
@@ -23,6 +26,20 @@ contract YesPolicy is IUserOpPolicy, IActionPolicy, I1271Policy {
 
     function checkUserOpPolicy(ConfigId id, PackedUserOperation calldata userOp) external override returns (uint256) {
         userOpState[id][msg.sender][userOp.sender] += 1;
+        return 0;
+    }
+
+    function checkUserOpZkPolicy(
+        ConfigId id,
+        PackedUserOperation calldata userOp,
+        bytes32 userOpHash,
+        bytes memory proof
+    )
+        external
+        override
+        returns (uint256)
+    {
+        zkUserOpState[id][msg.sender][userOp.sender] += 1;
         return 0;
     }
 
@@ -42,8 +59,8 @@ contract YesPolicy is IUserOpPolicy, IActionPolicy, I1271Policy {
 
     function supportsInterface(bytes4 interfaceID) external view override returns (bool) {
         return interfaceID == type(IPolicy).interfaceId || interfaceID == type(IUserOpPolicy).interfaceId
-            || interfaceID == type(IActionPolicy).interfaceId || interfaceID == type(I1271Policy).interfaceId
-            || interfaceID == type(IERC165).interfaceId;
+            || interfaceID == type(IUserOpZkPolicy).interfaceId || interfaceID == type(IActionPolicy).interfaceId
+            || interfaceID == type(I1271Policy).interfaceId || interfaceID == type(IERC165).interfaceId;
     }
 
     function check1271SignedAction(

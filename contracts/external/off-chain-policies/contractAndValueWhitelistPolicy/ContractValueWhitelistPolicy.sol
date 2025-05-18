@@ -89,6 +89,7 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
         bytes memory proof
     )
         external
+        override
         returns (uint256)
     {
         return _verifyProof(id, msg.sender, op.sender, op, userOpHash, proof);
