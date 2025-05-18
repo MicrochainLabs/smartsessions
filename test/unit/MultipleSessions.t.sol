@@ -56,8 +56,9 @@ contract MultipleSessionsTest is BaseTest {
         UserOpData memory userOpData =
             instance.getExecOps({ target: to, value: value, callData: callData, txValidator: address(smartSession) });
 
+        bytes[] memory proofs = new bytes[](0);
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.execUserOps();
     }
 
@@ -117,7 +118,8 @@ contract MultipleSessionsTest is BaseTest {
         UserOpData memory userOpData =
             instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
+        bytes[] memory proofs = new bytes[](0);
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.execUserOps();
 
         assertEq(target.value(), 3);
@@ -139,8 +141,7 @@ contract MultipleSessionsTest is BaseTest {
 
         // get userOp from ModuleKit
         userOpData = instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
-
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.execUserOps();
 
         assertEq(target.value(), 2);
@@ -153,7 +154,7 @@ contract MultipleSessionsTest is BaseTest {
         );
 
         userOpData = instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
 
         instance.expect4337Revert();
         userOpData.execUserOps();
@@ -174,7 +175,8 @@ contract MultipleSessionsTest is BaseTest {
         UserOpData memory userOpData =
             instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
+        bytes[] memory proofs = new bytes[](0);
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }
@@ -190,7 +192,8 @@ contract MultipleSessionsTest is BaseTest {
         UserOpData memory userOpData =
             instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
+        bytes[] memory proofs = new bytes[](0);
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.execUserOps();
     }
 
@@ -205,7 +208,8 @@ contract MultipleSessionsTest is BaseTest {
         UserOpData memory userOpData =
             instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
+        bytes[] memory proofs = new bytes[](0);
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.execUserOps();
     }
 }

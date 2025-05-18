@@ -90,7 +90,8 @@ contract SpendingLimitTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
+        userOpData.userOp.signature =
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }

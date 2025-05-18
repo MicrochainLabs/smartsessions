@@ -98,9 +98,9 @@ contract SmartSessionCallTest is BaseTest {
             callData: abi.encodeCall(ISmartSession.revokeEnableSignature, (permissionId_smartsession)),
             txValidator: address(smartSession)
         });
-
+        bytes[] memory proofs = new bytes[](0);
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_smartsession, sig: encodeSignature() });
+            EncodeLib.encodeUse({ permissionId: permissionId_smartsession, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.execUserOps();
 
         userOpData = instance.getExecOps({
@@ -111,7 +111,7 @@ contract SmartSessionCallTest is BaseTest {
         });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_smartsession, sig: encodeSignature() });
+            EncodeLib.encodeUse({ permissionId: permissionId_smartsession, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.execUserOps();
 
         uint256 nonceAfter = smartSession.getNonce(permissionId_smartsession, address(instance.account));
@@ -130,8 +130,9 @@ contract SmartSessionCallTest is BaseTest {
             txValidator: address(smartSession)
         });
 
+        bytes[] memory proofs = new bytes[](0);
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_normalFallback, sig: encodeSignature() });
+            EncodeLib.encodeUse({ permissionId: permissionId_normalFallback, sig: encodeSignatureAndProofsWithCompression(proofs) });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }

@@ -98,13 +98,6 @@ contract BaseTest is RhinestoneModuleKit, Test {
         instance.installModule({ moduleTypeId: MODULE_TYPE_VALIDATOR, module: address(smartSession), data: "" });
     }
 
-    function encodeSignature() internal returns (bytes memory) {
-        bytes[] memory signatureAndProof = new bytes[](1);
-        signatureAndProof[0] = hex"4141414141";
-        // Encode the array using ABI encoding
-        bytes memory compressedData = abi.encode(signatureAndProof);
-        return compressedData.flzCompress();
-    }
 
     //bytes[] memory proofs = new bytes[](0);
     //bytes[] memory proofs = new bytes[](1);  proofs[0] = hex"4141414141";

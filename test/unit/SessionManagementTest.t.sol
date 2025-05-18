@@ -312,8 +312,9 @@ contract SessionManagementTest is BaseTest {
             txValidator: address(smartSession)
         });
 
+        bytes[] memory proofs = new bytes[](0);
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: multiActionPermissionId, sig: encodeSignature() });
+            EncodeLib.encodeUse({ permissionId: multiActionPermissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
 
         uint256 now = block.timestamp;
         policy1.setValidationData(
