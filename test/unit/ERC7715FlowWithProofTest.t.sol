@@ -4,7 +4,7 @@ import "solady/utils/ECDSA.sol";
 import "contracts/lib/IdLib.sol";
 import { LibZip } from "solady/utils/LibZip.sol";
 
-contract ERC7715FlowTest is BaseTest {
+contract ERC7715FlowTestWithProof is BaseTest {
     using IdLib for *;
     using ModuleKitHelpers for *;
     using ModuleKitUserOp for *;
@@ -19,7 +19,6 @@ contract ERC7715FlowTest is BaseTest {
         userOpBuilder = new UserOperationBuilder(ep);
     }
 
-    // forge test  --match-contract ERC7715FlowTest -vvv
     function test_7715_flow(bytes32 salt)
         public
         returns (PermissionId permissionId, EnableSession memory enableSessions)
@@ -37,7 +36,7 @@ contract ERC7715FlowTest is BaseTest {
             salt: salt,
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
-            userOpZkPolicies: new PolicyData[](0),
+            userOpZkPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: _getEmptyActionDatas(_target, MockTarget.setValue.selector, address(yesPolicy)),
             permitERC4337Paymaster: true
@@ -67,9 +66,9 @@ contract ERC7715FlowTest is BaseTest {
 
         userOpData.userOp.nonce = nonce;
         userOpData.userOp.callData = callData;
-        bytes[] memory signatureAndProof = new bytes[](1);
+        bytes[] memory signatureAndProof = new bytes[](2);
         signatureAndProof[0] = hex"4141414141";
-        //signatureAndProof[1] = hex"4141414141";
+        signatureAndProof[1] = hex"4141414141";
         bytes memory compressedData = abi.encode(signatureAndProof);
         userOpData.userOp.signature = compressedData;
 

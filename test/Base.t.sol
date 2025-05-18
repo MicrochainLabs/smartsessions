@@ -111,6 +111,12 @@ contract BaseTest is RhinestoneModuleKit, Test {
         policyDatas[0] = _getEmptyPolicyData(policyContract);
     }
 
+     function _getTwoEmptyPolicyDatas(address policyContract, address policyContract1) internal pure returns (PolicyData[] memory policyDatas) {
+        policyDatas = new PolicyData[](2);
+        policyDatas[0] = _getEmptyPolicyData(policyContract);
+        policyDatas[1] = _getEmptyPolicyData(policyContract1);
+    }
+
     function test_constant() public {
         ActionId fallbackActionId =
             ActionId.wrap(keccak256(abi.encodePacked(FALLBACK_TARGET_FLAG, FALLBACK_TARGET_SELECTOR_FLAG)));

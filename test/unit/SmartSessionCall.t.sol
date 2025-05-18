@@ -7,10 +7,13 @@ import { NoPolicy } from "../mock/NoPolicy.sol";
 
 import "solmate/test/utils/mocks/MockERC20.sol";
 import "forge-std/interfaces/IERC20.sol";
+import { LibZip } from "solady/utils/LibZip.sol";
 
 contract SmartSessionCallTest is BaseTest {
     using ModuleKitHelpers for *;
     using ModuleKitUserOp for *;
+    using LibZip for bytes;
+
 
     MockERC20 token1;
     MockERC20 token2;
@@ -18,6 +21,14 @@ contract SmartSessionCallTest is BaseTest {
     PermissionId permissionId_normalFallback;
 
     NoPolicy noPolicy;
+
+    function encodeSignatureAndProofs() private returns (bytes memory) {
+        bytes[] memory signatureAndProof = new bytes[](1);
+        signatureAndProof[0] = hex"4141414141";
+        // Encode the array using ABI encoding
+        bytes memory compressedData = abi.encode(signatureAndProof);
+        return compressedData.flzCompress();
+    }
 
     function setUp() public virtual override {
         super.setUp();
@@ -100,7 +111,7 @@ contract SmartSessionCallTest is BaseTest {
         });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_smartsession, sig: hex"4141414141" });
+            EncodeLib.encodeUse({ permissionId: permissionId_smartsession, sig: encodeSignatureAndProofs() });
         userOpData.execUserOps();
 
         userOpData = instance.getExecOps({
@@ -111,7 +122,7 @@ contract SmartSessionCallTest is BaseTest {
         });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_smartsession, sig: hex"4141414141" });
+            EncodeLib.encodeUse({ permissionId: permissionId_smartsession, sig: encodeSignatureAndProofs() });
         userOpData.execUserOps();
 
         uint256 nonceAfter = smartSession.getNonce(permissionId_smartsession, address(instance.account));
@@ -131,7 +142,7 @@ contract SmartSessionCallTest is BaseTest {
         });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_normalFallback, sig: hex"4141414141" });
+            EncodeLib.encodeUse({ permissionId: permissionId_normalFallback, sig: encodeSignatureAndProofs() });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }
