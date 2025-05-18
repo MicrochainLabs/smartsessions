@@ -119,7 +119,10 @@ contract SudoAndStrictPermissionTest is BaseTest {
         });
 
         bytes[] memory proofs = new bytes[](0);
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_sudo, sig: encodeSignatureAndProofsWithCompression(proofs) });
+        userOpData.userOp.signature = EncodeLib.encodeUse({
+            permissionId: permissionId_sudo,
+            sig: encodeSignatureAndProofsWithCompression(proofs)
+        });
         userOpData.execUserOps();
         assertEq(token1.balanceOf(recipient), 1 ether);
 
@@ -131,7 +134,10 @@ contract SudoAndStrictPermissionTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_sudo, sig: encodeSignatureAndProofsWithCompression(proofs) });
+        userOpData.userOp.signature = EncodeLib.encodeUse({
+            permissionId: permissionId_sudo,
+            sig: encodeSignatureAndProofsWithCompression(proofs)
+        });
         userOpData.execUserOps();
         assertEq(token2.balanceOf(recipient), 100 ether);
     }
@@ -148,7 +154,10 @@ contract SudoAndStrictPermissionTest is BaseTest {
         });
 
         bytes[] memory proofs = new bytes[](0);
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_strict, sig: encodeSignatureAndProofsWithCompression(proofs) });
+        userOpData.userOp.signature = EncodeLib.encodeUse({
+            permissionId: permissionId_strict,
+            sig: encodeSignatureAndProofsWithCompression(proofs)
+        });
 
         bytes memory expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,
@@ -168,8 +177,10 @@ contract SudoAndStrictPermissionTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_strict2, sig: encodeSignatureAndProofsWithCompression(proofs) });
+        userOpData.userOp.signature = EncodeLib.encodeUse({
+            permissionId: permissionId_strict2,
+            sig: encodeSignatureAndProofsWithCompression(proofs)
+        });
         expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,
             0,

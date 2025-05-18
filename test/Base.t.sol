@@ -98,7 +98,6 @@ contract BaseTest is RhinestoneModuleKit, Test {
         instance.installModule({ moduleTypeId: MODULE_TYPE_VALIDATOR, module: address(smartSession), data: "" });
     }
 
-
     //bytes[] memory proofs = new bytes[](0);
     //bytes[] memory proofs = new bytes[](1);  proofs[0] = hex"4141414141";
     function encodeSignatureAndProofsWithoutCompression(bytes[] memory proofs) internal returns (bytes memory) {

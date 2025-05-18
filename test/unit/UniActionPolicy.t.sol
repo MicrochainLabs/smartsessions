@@ -39,7 +39,8 @@ contract UniversalActionPolicyTest is BaseTest {
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
         // mock signture, as it is YesPolicy that is being used in the session
         bytes[] memory proofs = new bytes[](0);
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
+        userOpData.userOp.signature =
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
 
         // execute userOp with modulekit
         userOpData.execUserOps();
@@ -68,7 +69,8 @@ contract UniversalActionPolicyTest is BaseTest {
         });
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
         bytes[] memory proofs = new bytes[](0);
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
+        userOpData.userOp.signature =
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
 
         // first one should pass
         userOpData.execUserOps();
@@ -80,7 +82,8 @@ contract UniversalActionPolicyTest is BaseTest {
             callData: callData,
             txValidator: address(smartSession)
         });
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
+        userOpData.userOp.signature =
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
 
         bytes memory expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,
