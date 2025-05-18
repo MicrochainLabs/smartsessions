@@ -2,7 +2,6 @@ import "../Base.t.sol";
 import "contracts/core/SmartSessionBase.sol";
 import "solady/utils/ECDSA.sol";
 import "contracts/lib/IdLib.sol";
-import { LibZip } from "solady/utils/LibZip.sol";
 
 import "contracts/external/policies/ERC20SpendingLimitPolicy.sol";
 import "solmate/test/utils/mocks/MockERC20.sol";
@@ -13,7 +12,6 @@ contract SpendingLimitAndContractValueWhitelistTest is BaseTest {
     using ModuleKitHelpers for *;
     using ModuleKitUserOp for *;
     using EncodeLib for PermissionId;
-    using LibZip for bytes;
 
     ERC20SpendingLimitPolicy spendingLimit;
 
@@ -78,15 +76,11 @@ contract SpendingLimitAndContractValueWhitelistTest is BaseTest {
             callData: abi.encodeCall(IERC20.transfer, (recipient, 1 ether)),
             txValidator: address(smartSession)
         });
-        bytes[] memory signatureAndProof = new bytes[](2);
-        signatureAndProof[0] = hex"4141414141";
-        signatureAndProof[1] = hex"4141414141";
-
-        // Encode the array using ABI encoding
-        bytes memory compressedData = abi.encode(signatureAndProof);
+        bytes[] memory proofs = new bytes[](1);
+        proofs[0] = hex"4141414141";
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId, sig: compressedData.flzCompress() });
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.execUserOps();
         assertEq(token.balanceOf(recipient), 1 ether);
 
@@ -97,7 +91,7 @@ contract SpendingLimitAndContractValueWhitelistTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: compressedData });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }

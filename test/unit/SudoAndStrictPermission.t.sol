@@ -166,7 +166,8 @@ contract SudoAndStrictPermissionTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_strict2, sig: encodeSignature() });
+        userOpData.userOp.signature =
+            EncodeLib.encodeUse({ permissionId: permissionId_strict2, sig: encodeSignature() });
         expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,
             0,

@@ -106,37 +106,26 @@ contract BaseTest is RhinestoneModuleKit, Test {
         return compressedData.flzCompress();
     }
 
-    function encodeSignatureAndProofs() internal returns (bytes memory) {
-        bytes[] memory signatureAndProof = new bytes[](2);
-        signatureAndProof[0] = hex"4141414141";
-        signatureAndProof[1] = hex"4141414141";
-        // Encode the array using ABI encoding
-        bytes memory compressedData = abi.encode(signatureAndProof);
-        return compressedData.flzCompress();
-    }
-
-    //bytes[] memory proofs = new bytes[](0)
+    //bytes[] memory proofs = new bytes[](0);
     //bytes[] memory proofs = new bytes[](1);  proofs[0] = hex"4141414141";
     function encodeSignatureAndProofsWithoutCompression(bytes[] memory proofs) internal returns (bytes memory) {
         bytes[] memory signatureAndProofs = new bytes[](1 + proofs.length);
         signatureAndProofs[0] = hex"4141414141";
-        for (uint i = 0; i < proofs.length; i++) {
+        for (uint256 i = 0; i < proofs.length; i++) {
             signatureAndProofs[i + 1] = proofs[i];
         }
         return abi.encode(signatureAndProofs);
     }
 
-
     function encodeSignatureAndProofsWithCompression(bytes[] memory proofs) internal returns (bytes memory) {
         bytes[] memory signatureAndProofs = new bytes[](1 + proofs.length);
         signatureAndProofs[0] = hex"4141414141";
-        for (uint i = 0; i < proofs.length; i++) {
+        for (uint256 i = 0; i < proofs.length; i++) {
             signatureAndProofs[i + 1] = proofs[i];
         }
         return abi.encode(signatureAndProofs).flzCompress();
     }
 
-    
     function sign(bytes32 hash, uint256 privKey) internal pure returns (bytes memory signature) {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(privKey, hash);
         // Set the signature

@@ -60,8 +60,11 @@ contract PaymasterOptTest is BaseTest {
             callData: abi.encodeCall(IERC20.transfer, (recipient, 1 ether)),
             txValidator: address(smartSession)
         });
+        bytes[] memory proofs = new bytes[](1);
+        proofs[0] = hex"4141414141";
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+        userOpData.userOp.signature =
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.userOp.paymasterAndData =
             abi.encodePacked(address(paymaster), uint128(1_000_000), uint128(10_000_000));
         userOpData.execUserOps();
@@ -96,8 +99,11 @@ contract PaymasterOptTest is BaseTest {
             callData: abi.encodeCall(IERC20.transfer, (recipient, 1 ether)),
             txValidator: address(smartSession)
         });
+        bytes[] memory proofs = new bytes[](1);
+        proofs[0] = hex"4141414141";
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+        userOpData.userOp.signature =
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
         userOpData.userOp.paymasterAndData =
             abi.encodePacked(address(paymaster), uint128(1_000_000), uint128(10_000_000));
         instance.expect4337Revert();
