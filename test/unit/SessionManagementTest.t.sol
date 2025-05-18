@@ -8,12 +8,14 @@ import {
     _packValidationData,
     _parseValidationData
 } from "@ERC4337/account-abstraction/contracts/core/Helpers.sol";
+import { LibZip } from "solady/utils/LibZip.sol";
 
 contract SessionManagementTest is BaseTest {
     using IdLib for *;
     using ModuleKitHelpers for *;
     using ModuleKitUserOp for *;
     using EncodeLib for PermissionId;
+    using LibZip for bytes;
 
     MockPolicy policy1;
     MockPolicy policy2;
@@ -72,8 +74,10 @@ contract SessionManagementTest is BaseTest {
         enableSessions.permissionEnableSig =
             abi.encodePacked(mockK1, sign(ECDSA.toEthSignedMessageHash(hash), owner.key));
 
+        bytes[] memory proofs = new bytes[](1);
+        proofs[0] = hex"4141414141";
         // session key signs the userOP
-        userOpData.userOp.signature = EncodeLib.encodeUnsafeEnable(hex"4141414142", enableSessions);
+        userOpData.userOp.signature = EncodeLib.encodeUnsafeEnable(encodeSignatureAndProofsWithoutCompression(proofs), enableSessions);
 
         // execute userOp with modulekit
         userOpData.execUserOps();
@@ -93,7 +97,7 @@ contract SessionManagementTest is BaseTest {
 
         // We can reuse the same permissionId since the session is already enabled
         // NOTE: this is using encodeUse() since the session is already enabled
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
 
         // execute userOp with modulekit
         userOpData.execUserOps();
@@ -132,8 +136,10 @@ contract SessionManagementTest is BaseTest {
             callData: callData,
             txValidator: address(smartSession)
         });
+        bytes[] memory proofs = new bytes[](1);
+        proofs[0] = hex"4141414141";
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
 
         // execute userOp with modulekit
         userOpData.execUserOps();
@@ -176,7 +182,9 @@ contract SessionManagementTest is BaseTest {
         bytes32 hash = HashLib.multichainDigest(enableSessions.hashesAndChainIds);
         enableSessions.permissionEnableSig =
             abi.encodePacked(mockK1, sign(ECDSA.toEthSignedMessageHash(hash), owner.key));
-        userOpData.userOp.signature = EncodeLib.encodeUnsafeEnable(hex"4141414142", enableSessions);
+        bytes[] memory proofs = new bytes[](1);
+        proofs[0] = hex"4141414141";
+        userOpData.userOp.signature = EncodeLib.encodeUnsafeEnable(encodeSignatureAndProofsWithoutCompression(proofs), enableSessions);
 
         userOpData.execUserOps();
 
@@ -199,14 +207,16 @@ contract SessionManagementTest is BaseTest {
             callData: abi.encodeCall(MockTarget.setValue, (4141)),
             txValidator: address(smartSession)
         });
+        bytes[] memory proofs = new bytes[](1);
+        proofs[0] = hex"4141414141";
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofsWithCompression(proofs) });
 
         instance.expect4337Revert();
         userOpData.execUserOps();
 
         // lets try to replay the same session. THIS MUST FAIL, otherwise session keys can just reenable themselves
-        userOpData.userOp.signature = EncodeLib.encodeUnsafeEnable(hex"4141414142", enableSessions);
+        userOpData.userOp.signature = EncodeLib.encodeUnsafeEnable(encodeSignatureAndProofsWithoutCompression(proofs), enableSessions);
         instance.expect4337Revert();
         userOpData.execUserOps();
     }
@@ -251,8 +261,10 @@ contract SessionManagementTest is BaseTest {
 
         vm.prank(instance.account);
         smartSession.revokeEnableSignature(permissionId);
+        bytes[] memory proofs = new bytes[](1);
+        proofs[0] = hex"4141414141";
         // session key signs the userOP
-        userOpData.userOp.signature = EncodeLib.encodeUnsafeEnable(hex"4141414142", enableSessions);
+        userOpData.userOp.signature = EncodeLib.encodeUnsafeEnable(encodeSignatureAndProofsWithoutCompression(proofs), enableSessions);
 
         // execute userOp with modulekit
         instance.expect4337Revert();
@@ -296,7 +308,7 @@ contract SessionManagementTest is BaseTest {
         });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: multiActionPermissionId, sig: hex"4141414141" });
+            EncodeLib.encodeUse({ permissionId: multiActionPermissionId, sig: encodeSignature() });
 
         uint256 now = block.timestamp;
         policy1.setValidationData(

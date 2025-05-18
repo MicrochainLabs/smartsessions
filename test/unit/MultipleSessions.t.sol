@@ -2,27 +2,17 @@ import "../Base.t.sol";
 import "contracts/core/SmartSessionBase.sol";
 import "solady/utils/ECDSA.sol";
 import "contracts/lib/IdLib.sol";
-import { LibZip } from "solady/utils/LibZip.sol";
 
 contract MultipleSessionsTest is BaseTest {
     using ModuleKitHelpers for *;
     using IdLib for *;
     using ModuleKitUserOp for *;
     using EncodeLib for PermissionId;
-    using LibZip for bytes;
 
     event Test__EmitCreatedConfigId(PermissionId permissionId);
 
     function setUp() public virtual override {
         super.setUp();
-    }
-
-    function encodeSignatureAndProofs() private returns (bytes memory) {
-        bytes[] memory signatureAndProof = new bytes[](1);
-        signatureAndProof[0] = hex"4141414141";
-        // Encode the array using ABI encoding
-        bytes memory compressedData = abi.encode(signatureAndProof);
-        return compressedData.flzCompress();
     }
 
     function _makeSession(
@@ -68,7 +58,7 @@ contract MultipleSessionsTest is BaseTest {
 
         // session key signs the userOP NOTE: this is using encodeUse() since the session is already enabled
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         userOpData.execUserOps();
     }
 
@@ -129,7 +119,7 @@ contract MultipleSessionsTest is BaseTest {
             instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         userOpData.execUserOps();
 
         assertEq(target.value(), 3);
@@ -153,7 +143,7 @@ contract MultipleSessionsTest is BaseTest {
         userOpData = instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         userOpData.execUserOps();
 
         assertEq(target.value(), 2);
@@ -167,7 +157,7 @@ contract MultipleSessionsTest is BaseTest {
 
         userOpData = instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
 
         instance.expect4337Revert();
         userOpData.execUserOps();
@@ -189,7 +179,7 @@ contract MultipleSessionsTest is BaseTest {
             instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }
@@ -206,7 +196,7 @@ contract MultipleSessionsTest is BaseTest {
             instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         userOpData.execUserOps();
     }
 
@@ -222,7 +212,7 @@ contract MultipleSessionsTest is BaseTest {
             instance.getExecOps({ executions: executions, txValidator: address(smartSession) });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignatureAndProofs() });
+            EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         userOpData.execUserOps();
     }
 }

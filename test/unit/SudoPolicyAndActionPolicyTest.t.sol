@@ -79,7 +79,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             salt: keccak256("salt"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: userOpPolicies,
-            userOpZkPolicies: userOpPolicies,
+            userOpZkPolicies: new PolicyData[](0),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: actionDatas,
             permitERC4337Paymaster: true
@@ -102,7 +102,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             salt: keccak256("salt2"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: onlyUserOpPolicies,
-            userOpZkPolicies: onlyUserOpPolicies,
+            userOpZkPolicies: new PolicyData[](0),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: new ActionData[](0), // Empty action data array
             permitERC4337Paymaster: true
@@ -126,7 +126,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         userOpData.execUserOps();
         assertEq(token1.balanceOf(recipient), 2 ether);
 
@@ -138,7 +138,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }
@@ -154,7 +154,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }
@@ -170,7 +170,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
 
         bytes memory expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,
@@ -193,7 +193,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId, sig: encodeSignature() });
         instance.expect4337Revert();
         userOpData.execUserOps();
     }
@@ -210,7 +210,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
         });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_onlyUserOpPolicy, sig: hex"4141414141" });
+            EncodeLib.encodeUse({ permissionId: permissionId_onlyUserOpPolicy, sig: encodeSignature() });
 
         bytes memory expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,
@@ -234,7 +234,7 @@ contract SudoPolicyAndActionPolicyTest is BaseTest {
         });
 
         userOpData.userOp.signature =
-            EncodeLib.encodeUse({ permissionId: permissionId_onlyUserOpPolicy, sig: hex"4141414141" });
+            EncodeLib.encodeUse({ permissionId: permissionId_onlyUserOpPolicy, sig: encodeSignature() });
 
         bytes memory expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,

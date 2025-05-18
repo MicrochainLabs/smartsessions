@@ -67,7 +67,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             salt: keccak256("salt and pepper"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
-            userOpZkPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
+            userOpZkPolicies: new PolicyData[](0),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             //actions: actionDatas
             actions: new ActionData[](0),
@@ -94,7 +94,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             salt: keccak256("salt and pepper explicit"),
             sessionValidatorInitData: "mockInitData",
             userOpPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
-            userOpZkPolicies: _getEmptyPolicyDatas(address(yesPolicy)),
+            userOpZkPolicies: new PolicyData[](0),
             erc7739Policies: _getEmptyERC7739Data("0", new PolicyData[](0)),
             actions: actionDatas,
             permitERC4337Paymaster: true
@@ -118,7 +118,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_sudo, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_sudo, sig: encodeSignature() });
         userOpData.execUserOps();
         assertEq(token1.balanceOf(recipient), 1 ether);
 
@@ -130,7 +130,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_sudo, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_sudo, sig: encodeSignature() });
         userOpData.execUserOps();
         assertEq(token2.balanceOf(recipient), 100 ether);
     }
@@ -146,7 +146,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_strict, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_strict, sig: encodeSignature() });
 
         bytes memory expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,
@@ -166,7 +166,7 @@ contract SudoAndStrictPermissionTest is BaseTest {
             txValidator: address(smartSession)
         });
 
-        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_strict2, sig: hex"4141414141" });
+        userOpData.userOp.signature = EncodeLib.encodeUse({ permissionId: permissionId_strict2, sig: encodeSignature() });
         expectedRevertReason = abi.encodeWithSelector(
             IEntryPoint.FailedOpWithRevert.selector,
             0,

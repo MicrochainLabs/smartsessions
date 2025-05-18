@@ -69,7 +69,6 @@ contract ERC7715FlowTest is BaseTest {
         userOpData.userOp.callData = callData;
         bytes[] memory signatureAndProof = new bytes[](1);
         signatureAndProof[0] = hex"4141414141";
-        //signatureAndProof[1] = hex"4141414141";
         bytes memory compressedData = abi.encode(signatureAndProof);
         userOpData.userOp.signature = compressedData;
 
