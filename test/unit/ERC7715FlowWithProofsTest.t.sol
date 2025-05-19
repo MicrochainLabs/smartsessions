@@ -2,14 +2,12 @@ import "../Base.t.sol";
 import "contracts/core/SmartSessionBase.sol";
 import "solady/utils/ECDSA.sol";
 import "contracts/lib/IdLib.sol";
-import { LibZip } from "solady/utils/LibZip.sol";
 
 contract ERC7715FlowTestWithProofs is BaseTest {
     using IdLib for *;
     using ModuleKitHelpers for *;
     using ModuleKitUserOp for *;
     using EncodeLib for PermissionId;
-    using LibZip for bytes;
 
     UserOperationBuilder internal userOpBuilder;
     YesPolicy internal yesPolicy1;
@@ -68,12 +66,10 @@ contract ERC7715FlowTestWithProofs is BaseTest {
 
         userOpData.userOp.nonce = nonce;
         userOpData.userOp.callData = callData;
-        bytes[] memory signatureAndProof = new bytes[](3);
-        signatureAndProof[0] = hex"4141414141";
-        signatureAndProof[1] = hex"4141414141";
-        signatureAndProof[2] = hex"4141414141";
-        bytes memory compressedData = abi.encode(signatureAndProof);
-        userOpData.userOp.signature = compressedData;
+        bytes[] memory proofs = new bytes[](2);
+        proofs[0] = hex"4141414141";
+        proofs[1] = hex"4141414141";
+        userOpData.userOp.signature = encodeSignatureAndProofsWithoutCompression(proofs);
 
         // format sig
         bytes memory formattedSig = userOpBuilder.formatSignature(instance.account, userOpData.userOp, context);
@@ -92,7 +88,7 @@ contract ERC7715FlowTestWithProofs is BaseTest {
 
         userOpData.userOp.nonce = nonce2;
         userOpData.userOp.callData = callData;
-        userOpData.userOp.signature = compressedData.flzCompress();
+        userOpData.userOp.signature = encodeSignatureAndProofsWithCompression(proofs);
 
         formattedSig = userOpBuilder.formatSignature(instance.account, userOpData.userOp, context);
         userOpData.userOp.signature = formattedSig;
