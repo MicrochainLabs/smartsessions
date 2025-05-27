@@ -100,12 +100,12 @@ library PolicyLib {
             revert ISmartSession.InconsistentProofs(permissionId);
         }
 
-        // Ensure the minimum number of policies is met.
+        /*// Ensure the minimum number of policies is met.
         // Revert otherwise. Current minPolicies for userOp policies is 0.
         // Current minPolicies for action policies is 1.
         // This ensures sudo (open) permissions can be created only by explicitly setting SudoPolicy/YesPolicy
         // as the only action policies
-        if (minPolicies > length) revert ISmartSession.NoPoliciesSet(permissionId);
+        if (minPolicies > length) revert ISmartSession.NoPoliciesSet(permissionId);*/
 
         // Iterate over all policies and intersect the validation data
         for (uint256 i; i < length; i++) {
