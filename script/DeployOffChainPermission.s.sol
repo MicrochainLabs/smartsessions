@@ -7,7 +7,6 @@ import "contracts/external/policies/SudoPolicy.sol";
 import "contracts/external/off-chain-policies/contractAndValueWhitelistPolicy/ContractValueWhitelistPolicy.sol";
 import "contracts/external/off-chain-policies/contractAndValueWhitelistPolicy/verification_key.sol";
 
-
 contract DeploySmartSessionWithOffChainPermission is Script {
     uint256 privKey;
 
@@ -37,7 +36,8 @@ contract DeploySmartSessionWithOffChainPermission is Script {
         Groth16Verifier groth16Verifier = new Groth16Verifier();
         console2.log("Groth16Verifier Address ", address(groth16Verifier));
 
-        ContractValueWhitelistPolicy contractValueWhitelistPolicy = new ContractValueWhitelistPolicy(IUserOpZkPolicyVerifier(address(groth16Verifier)));
+        ContractValueWhitelistPolicy contractValueWhitelistPolicy =
+            new ContractValueWhitelistPolicy(IUserOpZkPolicyVerifier(address(groth16Verifier)));
         console2.log("ContractValueWhitelistPolicy Address ", address(contractValueWhitelistPolicy));
     }
 }

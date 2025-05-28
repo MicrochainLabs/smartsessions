@@ -162,7 +162,7 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
                 address to = _tokenTransferOrApprove(callData);
                 callsInputs[5] = uint256(uint160(target));
                 callsInputs[7] = value;
-                callsInputs[9] = uint256(uint32(bytes4(callData[:4])));
+                if (callData.length > 4) callsInputs[9] = uint256(uint32(bytes4(callData[:4])));
                 callsInputs[11] = uint256(uint160(to));
             }
             // DEFAULT EXEC & BATCH CALL
@@ -184,7 +184,7 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
                     Execution calldata execution = executions[i];
                     callsInputs[5 + i] = uint256(uint160(execution.target));
                     callsInputs[valueIndex + i] = execution.value;
-                    callsInputs[functionSelectorIndex + i] = uint256(uint32(bytes4(execution.callData[:4])));
+                    if (execution.callData.length > 4) callsInputs[functionSelectorIndex + i] = uint256(uint32(bytes4(execution.callData[:4])));
                     address to = _tokenTransferOrApprove(execution.callData);
                     callsInputs[toIndex + i] = uint256(uint160(to));
                 }
@@ -196,6 +196,7 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
     }
 
     function _tokenTransferOrApprove(bytes calldata callData) internal pure returns (address) {
+        if (callData.length == 0) return address(0);
         bytes4 functionSelector = bytes4(callData[0:4]);
 
         if (functionSelector == IERC20.approve.selector) {

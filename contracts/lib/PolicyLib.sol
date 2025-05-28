@@ -114,7 +114,7 @@ library PolicyLib {
                 (permissionId.toUserOpPolicyId().toConfigId(), userOp, userOpHash, proofs[i + 1])
             );
             // Intersect the validation data from this policy with the accumulated result
-            vd = vd.intersect(policies[i].callPolicy(permissionId, callOnIPolicy));
+            vd = vd.intersect(policies[i].callZkPolicy(permissionId, callOnIPolicy));
         }
     }
 
@@ -196,6 +196,38 @@ library PolicyLib {
         _vd = ValidationData.wrap(validationDataFromPolicy);
         // Prevent a malfunctioning policy, to return the magic value RETRY_WITH_FALLBACK and change control flow
         if (_vd.isFailed()) revert ISmartSession.PolicyViolation(permissionId, policy);
+    }
+
+    function callZkPolicy(
+        address policy,
+        PermissionId permissionId,
+        bytes memory callOnIPolicy
+    )
+        internal
+        returns (ValidationData _vd)
+    {
+        // Call the policy contract with the provided calldata
+        (bool success, bytes memory returnDataFromPolicy) = policy.excessivelySafeCall({
+            // To better align with the ERC-4337 validation rules, we replaced gasleft() with type(uint256).max.
+            // This will accomplish the same result of forwarding all remaining gas.
+            // Note that there is no error for attempting to use more gas than is currently available, as this has been
+            // allowed since https://eips.ethereum.org/EIPS/eip-150#specification
+            _gas: type(uint256).max,
+            _value: 0,
+            _maxCopy: 32,
+            _calldata: callOnIPolicy
+        });
+        uint256 validationDataFromPolicy;
+        assembly {
+            //if (!success) revert PolicyCheckReverted(bytes32);
+            if iszero(success) {
+                mstore(0, 0xf4270752) // `PolicyCheckReverted(bytes32)`
+                mstore(0x20, mload(add(returnDataFromPolicy, 0x20)))
+                revert(0x1c, 0x24)
+            }
+            validationDataFromPolicy := mload(add(returnDataFromPolicy, 0x20))
+        }
+        _vd = ValidationData.wrap(validationDataFromPolicy);
     }
 
     /**
