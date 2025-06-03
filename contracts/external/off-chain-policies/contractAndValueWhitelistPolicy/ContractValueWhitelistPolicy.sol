@@ -184,7 +184,9 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
                     Execution calldata execution = executions[i];
                     callsInputs[5 + i] = uint256(uint160(execution.target));
                     callsInputs[valueIndex + i] = execution.value;
-                    if (execution.callData.length > 4) callsInputs[functionSelectorIndex + i] = uint256(uint32(bytes4(execution.callData[:4])));
+                    if (execution.callData.length > 4) {
+                        callsInputs[functionSelectorIndex + i] = uint256(uint32(bytes4(execution.callData[:4])));
+                    }
                     address to = _tokenTransferOrApprove(execution.callData);
                     callsInputs[toIndex + i] = uint256(uint160(to));
                 }

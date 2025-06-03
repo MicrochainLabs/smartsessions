@@ -282,7 +282,7 @@ contract SmartSession is ISmartSession, SmartSessionBase, SmartSessionERC7739 {
             /*                    Check UserOp ZK Policies                   */
             /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
             // Check UserOp ZK policies
-            // This reverts if policies are violated
+            // Minimum number of policies verification is disabled
             vd = vd.intersect(
                 $userOpZkPolicies.checkProofs({
                     permissionId: permissionId,
