@@ -76,7 +76,7 @@ sol! {
     #[derive(Serialize)]
     struct ERC7739Context {
         bytes32 appDomainSeparator;
-        string[] contentName;
+        string[] contentNames;
     }
 
     #[allow(missing_docs)]

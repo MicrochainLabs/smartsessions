@@ -28,7 +28,7 @@ pub fn mock_erc7739_context() -> ERC7739Context {
     let app_domain_sep = fixed_bytes!("506da236a69b2f437f547d7900eb350f6a4cb145b6b850a499f29954b24c5739");
     ERC7739Context {
         appDomainSeparator: app_domain_sep,
-        contentName: vec!["mockContent".to_string()]
+        contentNames: vec!["mockContent".to_string()]
     }
 }
 

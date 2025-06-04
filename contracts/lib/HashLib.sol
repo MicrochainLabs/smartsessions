@@ -18,10 +18,10 @@ bytes32 constant POLICY_DATA_TYPEHASH = 0xdddac12cd8b10a071bea04226e97ac94906983
 bytes32 constant ACTION_DATA_TYPEHASH = 0x35809859dccf8877c407a59527c2f00fb81ca9c198ebcb0c832c3deaa38d3502;
 
 // ERC7739Context(bytes32 appDomainSeparator,string[] contentName)
-bytes32 constant ERC7739_CONTEXT_TYPEHASH = 0x006166b2b3a1edaf1da1ce02715d02d4979a4ab93755bff9ec054b0e6a96a1da;
+bytes32 constant ERC7739_CONTEXT_TYPEHASH = 0x1279e8e51f7e94d188deec6565cf57a9d8fb67c3af6f6371db15a77917b558a9;
 
 // ERC7739Data(ERC7739Context[] allowedERC7739Content,PolicyData[] erc1271Policies)
-bytes32 constant ERC7739_DATA_TYPEHASH = 0xdfd9b5718eebaa2484740b4ea6939e96189024c15848f16ccce901118114e152;
+bytes32 constant ERC7739_DATA_TYPEHASH = 0xde9fdd71f0051e3971642ef4eec94e7542764ef8d0efe5640927cecb4dc84282;
 
 /*
  * SignedSession(
@@ -35,6 +35,7 @@ bytes32 constant ERC7739_DATA_TYPEHASH = 0xdfd9b5718eebaa2484740b4ea6939e9618902
  *     │   bool ignoreSecurityAttestations               // Ignore Registry / Security Attestations
  *     │   bool permitERC4337Paymaster                   // Allow Session Key to use ERC4337 paymaster
  *     │   PolicyData[] userOpPolicies                   // UserOp policies array
+       |   PolicyData[] userOpZkPolicies                 // UserOp Zk policies array
  *     │   ├── address policy                            // Policy contract address
  *     │   └── bytes initData                            // Policy initialization data
  *     │   ERC7739Data erc7739Policies                   // ERC7739 policies struct
@@ -57,15 +58,15 @@ bytes32 constant ERC7739_DATA_TYPEHASH = 0xdfd9b5718eebaa2484740b4ea6939e9618902
  *     uint256 nonce                                     // Nonce value
  * )
  */
-bytes32 constant SESSION_TYPEHASH = 0x9b1a968df52b84394cbfe090a3b1632f85db7cb5d6143002c02eaa045de16cb3;
+bytes32 constant SESSION_TYPEHASH = 0xdd717fc1d597a6e8cad4b9d024d402186692ccb235b9b38ef584de8bb04e5ed4;
 
-bytes32 constant SIGNED_PERMISSIONS_TYPEHASH = 0x06f08aa7a8f548f439f979e1f1d2aea0fd5be78780b911b51fb36ca4ee05da3d;
+bytes32 constant SIGNED_PERMISSIONS_TYPEHASH = 0xe28be918ba8a96dd0902679145103c00a3906912774cd6f4af650853888c691a;
 
 // ChainSession(uint64 chainId,SignedSession session)
-bytes32 constant CHAIN_SESSION_TYPEHASH = 0x172c8c1943acb48d81c502842a378e0fc97423ab53b61326f90b2f2fb5304883;
+bytes32 constant CHAIN_SESSION_TYPEHASH = 0xa30da10e87676a6a228a1ae7f08c08aaaf029cea330e29cb018ed5e9a5de84af;
 
 // MultiChainSession(ChainSession[] sessionsAndChainIds)
-bytes32 constant MULTICHAIN_SESSION_TYPEHASH = 0x1f40faa612e7dc0e41ac13b00d3ac764240b8e86b9668d4ff24a23f747d8d490;
+bytes32 constant MULTICHAIN_SESSION_TYPEHASH = 0xaf0962ea3f2a85dc87b57f4aeb9f9b31db30711b10143096e63dcbead7ac8abf;
 
 // keccak256("EIP712Domain(string name,string version)");
 bytes32 constant _MULTICHAIN_DOMAIN_TYPEHASH = 0xb03948446334eb9b2196d5eb166f69b9d49403eb4a12f36de8d3f9f3cb8e15c3;
