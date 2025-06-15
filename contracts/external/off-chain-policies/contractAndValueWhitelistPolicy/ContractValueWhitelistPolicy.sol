@@ -120,7 +120,7 @@ contract ContractValueWhitelistPolicy is IUserOpZkPolicy {
         inputs[0] = stateTreeRoot;
         inputs[1] = groth16Proof.opProof;
         inputs[2] = uint256(uint160(address(smartAccount)));
-        inputs[3] = uint256(ConfigId.unwrap(id));
+        inputs[3] = uint256(ConfigId.unwrap(id)) % SNARK_SCALAR_FIELD;
         inputs[4] = uint256(userOpHash) % SNARK_SCALAR_FIELD;
 
         if (!userOpPolicyVerifier.verifyProof(groth16Proof.a, groth16Proof.b, groth16Proof.c, inputs)) {
